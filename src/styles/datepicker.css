@@ -1,0 +1,260 @@
+.dp-root {
+    position: relative;
+    display: inline-block;
+}
+
+.dp-trigger {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 15px;
+    background: var(--bg-white);
+    backdrop-filter: blur(20px);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--r-md);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+    box-shadow: var(--shadow-xs);
+    white-space: nowrap;
+}
+
+.dp-trigger:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.dp-trigger.open {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    color: var(--text-primary);
+}
+
+.dp-trigger.has-range {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.dp-clear {
+    margin-left: 4px;
+    font-size: 15px;
+    line-height: 1;
+    color: var(--text-muted);
+    opacity: 0.7;
+    transition: opacity var(--dur), color var(--dur);
+    cursor: pointer;
+}
+.dp-clear:hover { opacity: 1; color: var(--accent-red); }
+
+/* ── Dropdown ── */
+.dp-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    display: flex;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 18px;
+    box-shadow: var(--shadow-lg);
+    z-index: 500;
+    overflow: hidden;
+    animation: dpPop 0.2s var(--ease);
+}
+
+@keyframes dpPop {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Left: Presets ── */
+.dp-presets {
+    width: 140px;
+    padding: 16px 12px;
+    border-right: 0.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dp-presets__title {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-label);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    padding-left: 8px;
+}
+
+.dp-preset-btn {
+    padding: 8px 10px;
+    text-align: left;
+    border: none;
+    background: transparent;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background var(--dur), color var(--dur);
+}
+
+.dp-preset-btn:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+/* ── Right: Calendar ── */
+.dp-calendar {
+    padding: 16px;
+}
+
+/* Month nav */
+.dp-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.dp-nav__label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+}
+
+.dp-nav__btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(120,120,128,0.1);
+    color: var(--text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--dur), color var(--dur);
+    line-height: 1;
+}
+
+.dp-nav__btn:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+/* Grid */
+.dp-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 34px);
+    gap: 2px;
+}
+
+.dp-daynames {
+    margin-bottom: 4px;
+}
+
+.dp-daynames span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* Day cells */
+.dp-day {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background var(--dur), color var(--dur);
+    position: relative;
+    z-index: 1;
+}
+
+.dp-day:hover:not(:disabled) {
+    background: rgba(120,120,128,0.12);
+}
+
+.dp-day.today {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.dp-day.today::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+/* Range highlight */
+.dp-day.in-range {
+    background: rgba(0,113,227,0.09);
+    border-radius: 0;
+    color: var(--text-primary);
+}
+
+/* Start & End */
+.dp-day.start,
+.dp-day.end {
+    background: var(--accent) !important;
+    color: #fff !important;
+    border-radius: 50%;
+    font-weight: 700;
+}
+
+.dp-day.start.in-range,
+.dp-day.end.in-range {
+    border-radius: 50%;
+}
+
+/* When start & end are in same row — connect them */
+.dp-day.start { border-radius: 50% 0 0 50%; }
+.dp-day.end   { border-radius: 0 50% 50% 0; }
+.dp-day.start.end { border-radius: 50%; }
+
+/* Future days */
+.dp-day.future {
+    color: var(--text-muted);
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Hint */
+.dp-hint {
+    margin-top: 12px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: center;
+    font-weight: 500;
+    min-height: 16px;
+}
