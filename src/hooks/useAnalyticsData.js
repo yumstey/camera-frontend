@@ -28,7 +28,6 @@ export function useAnalyticsData(
   to,
 ) {
   const [data, setData] = useState({
-    stats: null,
     visitorActivity: null,
   });
 
@@ -38,15 +37,6 @@ export function useAnalyticsData(
   const fetchAll = useCallback(async () => {
     try {
       setError(null);
-      const dateString = selectedDate
-        ? selectedDate.toISOString().slice(0, 10)
-        : new Date().toISOString().slice(0, 10);
-
-      const currentDate = selectedDate || new Date();
-      const monthString = String(currentDate.getMonth() + 1).padStart(2, "0");
-      const yearString = currentDate.getFullYear();
-      const monthParam = `${yearString}-${monthString}`;
-
       const visitorActivityPromise = (async () => {
         if ((from, to)) {
           const data = await getDashboardFilter("all", from, to);
@@ -67,46 +57,13 @@ export function useAnalyticsData(
           return normalizeRows(data);
         }
       })();
-
       const [
-        dailyReport,
-        avgWeek,
-        avgMonth,
         visitorActivity,
-        peakWeek,
-        peakMonth,
-        monthlyOverview,
       ] = await Promise.all([
-        getDailyReport(dateString),
-        getAverageReport("week"),
-        getAverageReport("month"),
         visitorActivityPromise,
-        getPeakLoad("week"),
-        getPeakLoad("month"),
       ]);
-
-      const checkin = dailyReport?.report?.checkin ?? 0;
-      const checkout = dailyReport?.report?.checkout ?? 0;
-
-      const weeklyAvg = avgWeek?.rows?.[0]?.average?.total_visitors ?? 0;
-      const monthlyAvg = avgMonth?.rows?.[0]?.average?.total_visitors ?? 0;
-
-      const stats = {
-        nowInPark: { value: checkin, change: 0 },
-        loginsToday: { value: checkin, change: 0 },
-        outputsToday: { value: monthlyAvg, change: 0 },
-        avgPerWeek: { value: weeklyAvg, change: 0 },
-      };
-
-      const peakLoad = {
-        weekly: normalizeRows(peakWeek),
-        monthly: normalizeRows(peakMonth),
-      };
-
       setData({
-        stats,
         visitorActivity: visitorActivity ?? [],
-        peakLoad,
       });
       setLastUpdated(new Date());
     } catch (err) {

@@ -1,7 +1,7 @@
 import http from "./http";
 
 export async function getDailyReport(day) {
-  const { data } = await http.get("/dashboard/daily", { params: { day } });
+  const { data } = await http.get(`/dashboard/daily?day=${day}`);
   return data;
 }
 

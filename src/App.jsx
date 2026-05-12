@@ -11,15 +11,11 @@ import TrafficGenderChart from "./components/TrafficGenderChart";
 import TrafficGroupChart from "./components/TrafficGroup.jsx";
 import VisitorActivityChart from "./components/VisitorActivityChart";
 import { useTabData } from "./hooks/useAnalyticsData";
+import {DashboardStats} from './components/DashboardStats.jsx'
+import { Spinner } from "./components/Spinner.jsx";
 
-function Spinner() {
-  return (
-    <div className="loading-overlay">
-      <div className="spinner" />
-      Загрузка...
-    </div>
-  );
-}
+
+
 
 export default function App() {
   const [account, setAccount] = useState(() => loadAccount());
@@ -90,38 +86,7 @@ export default function App() {
             )}
             {error && <div className="error-msg">⚠ {error}</div>}
             <p className="block-label">Обзор</p>
-            {loading || !data.stats ? (
-              <div className="stat-cards-grid">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="stat-card" style={{ minHeight: 90 }}>
-                    <Spinner />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="stat-cards-grid">
-                <StatCard
-                  label="Сейчас в парке"
-                  value={data.stats.nowInPark.value}
-                  change={data.stats.nowInPark.change}
-                />
-                <StatCard
-                  label="Пришло сегодня"
-                  value={data.stats.loginsToday.value}
-                  change={data.stats.loginsToday.change}
-                />
-                <StatCard
-                  label="Среднее / месяц"
-                  value={data.stats.outputsToday.value}
-                  change={data.stats.outputsToday.change}
-                />
-                <StatCard
-                  label="Среднее / неделя"
-                  value={data.stats.avgPerWeek.value}
-                  change={data.stats.avgPerWeek.change}
-                />
-              </div>
-            )}
+           <DashboardStats day={selectedDate} />
             <p className="block-label" style={{ marginTop: 16 }}>
               Активность посетителей
             </p>
