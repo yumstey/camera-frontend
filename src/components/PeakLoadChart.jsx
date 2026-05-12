@@ -46,7 +46,7 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 export default function PeakLoadChart({ data }) {
-    const [tab, setTab] = useState('weekly'); // 'weekly' | 'monthly'
+    const [tab, setTab] = useState('weekly');
 
     const chartData = data?.[tab] || [];
     const maxVal = chartData.length ? Math.max(...chartData.map(d => d.max)) : 0;
@@ -65,9 +65,9 @@ export default function PeakLoadChart({ data }) {
         <div className="chart-card">
             <div className="chart-card__header">
                 <div>
-                    <h3 className="chart-card__title">Пиковая нагрузка</h3>
+                    <h3 className="chart-card__title">Нагрузка</h3>
                     <p className="chart-card__subtitle">
-                        Количество посетителей — мин / сред / макс
+                        Количество посетителей — макс / Сред
                     </p>
                 </div>
 
@@ -87,7 +87,6 @@ export default function PeakLoadChart({ data }) {
             <div className="peak-stats-row">
                 <StatPill label="Макс" value={maxVal} color="#1a1d23" />
                 <StatPill label="Сред" value={avgVal} color="#4a90d9" />
-                <StatPill label="Мин" value={minVal} color="#7ec87e" />
             </div>
 
             <ResponsiveContainer width="100%" height={190}>
@@ -121,8 +120,7 @@ export default function PeakLoadChart({ data }) {
                          barSize={tab === 'monthly' ? 4 : 10} />
                     <Bar dataKey="avg" name="Сред" fill="#4a90d9" radius={[3,3,0,0]}
                          barSize={tab === 'monthly' ? 4 : 10} />
-                    <Bar dataKey="min" name="Мин" fill="#7ec87e" radius={[3,3,0,0]}
-                         barSize={tab === 'monthly' ? 4 : 10} />
+                  
                 </BarChart>
             </ResponsiveContainer>
         </div>

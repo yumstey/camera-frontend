@@ -13,7 +13,7 @@ function CustomTooltip({ active, payload }) {
   );
 }
 
-export default function TrafficGenderChart( {title = 'Трафик по категориям' }) {
+export default function TrafficGroupChart( {title = 'Трафик по категориям' }) {
   const [tab, setTab] = useState('weekly');
   const [data , setData] = useState()
 
