@@ -4,7 +4,10 @@ import {
   getDailyReport,
   getDashboardFilter,
   getHourlyReport,
+  getMonthlyOverview,
   getPeakLoad,
+  getTrafficByAgeGroups,
+  getTrafficByGender,
 } from "../api/analyticsApi";
 
 const REFRESH_INTERVAL = 30_000;
@@ -19,7 +22,43 @@ function normalizeRows(response) {
   return [];
 }
 
+function parseGenderData(rows) {
+  if (!rows || !Array.isArray(rows)) return null;
 
+  const aggregated = { male: 0, female: 0 };
+  rows.forEach((row) => {
+    if (row.genders) {
+      aggregated.male += row.genders.male || 0;
+      aggregated.female += row.genders.female || 0;
+    }
+  });
+
+  return [
+    { name: "Male", value: aggregated.male, color: "#3b82f6" },
+    { name: "Female", value: aggregated.female, color: "#ec4899" },
+  ];
+}
+
+function parseAgeData(rows) {
+  if (!rows || !Array.isArray(rows)) return null;
+
+  const aggregated = { kids: 0, teenagers: 0, adults: 0, older: 0 };
+  rows.forEach((row) => {
+    if (row.age_groups) {
+      aggregated.kids += row.age_groups.kids || 0;
+      aggregated.teenagers += row.age_groups.teenagers || 0;
+      aggregated.adults += row.age_groups.adults || 0;
+      aggregated.older += row.age_groups.older || 0;
+    }
+  });
+
+  return [
+    { name: "Kids", value: aggregated.kids, color: "#6366f1" },
+    { name: "Teenagers", value: aggregated.teenagers, color: "#3b82f6" },
+    { name: "Adults", value: aggregated.adults, color: "#8b5cf6" },
+    { name: "Older", value: aggregated.older, color: "#ec4899" },
+  ];
+}
 
 export function useAnalyticsData(
   selectedDate,
@@ -30,12 +69,17 @@ export function useAnalyticsData(
   const [data, setData] = useState({
     stats: null,
     visitorActivity: null,
+    peakLoad: null,
+    genderActivity: null,
+    ageActivity: null,
   });
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+
   const fetchAll = useCallback(async () => {
+    console.log('fetched fetchALL')
     try {
       setError(null);
       const dateString = selectedDate
@@ -47,8 +91,13 @@ export function useAnalyticsData(
       const yearString = currentDate.getFullYear();
       const monthParam = `${yearString}-${monthString}`;
 
+      const overviewPromise = getMonthlyOverview(monthParam).catch(() => null);
+
       const visitorActivityPromise = (async () => {
-        if ((from, to)) {
+    console.log('fetched visitorActivityPromise')
+
+          if (from , to) {
+          console.log('STARTED FETCH')
           const data = await getDashboardFilter("all", from, to);
           return normalizeRows(data);
         }
@@ -64,8 +113,13 @@ export function useAnalyticsData(
         if (activeTab === "Сегодня") {
           const today = new Date().toISOString().split("T")[0];
           const data = await getHourlyReport(today);
+          console.log(data, "DATA IN TAB");
           return normalizeRows(data);
         }
+      
+        const hourlyData = await getHourlyReport(dateString);
+
+        return normalizeRows(hourlyData);
       })();
 
       const [
@@ -83,6 +137,7 @@ export function useAnalyticsData(
         visitorActivityPromise,
         getPeakLoad("week"),
         getPeakLoad("month"),
+        overviewPromise,
       ]);
 
       const checkin = dailyReport?.report?.checkin ?? 0;
@@ -98,6 +153,36 @@ export function useAnalyticsData(
         avgPerWeek: { value: weeklyAvg, change: 0 },
       };
 
+      let genderActivity =
+        monthlyOverview?.genderTraffic ??
+        monthlyOverview?.gender ??
+        monthlyOverview?.trafficByGender;
+
+      if (!genderActivity && monthlyOverview?.rows) {
+        genderActivity = parseGenderData(monthlyOverview.rows);
+      }
+
+      if (!genderActivity) {
+        genderActivity = await getTrafficByGender();
+      }
+
+      genderActivity = genderActivity ?? [];
+
+      let ageActivity =
+        monthlyOverview?.ageGroups ??
+        monthlyOverview?.ages ??
+        monthlyOverview?.age_groups;
+
+      if (!ageActivity && monthlyOverview?.rows) {
+        ageActivity = parseAgeData(monthlyOverview.rows);
+      }
+
+      if (!ageActivity) {
+        ageActivity = await getTrafficByAgeGroups();
+      }
+
+      ageActivity = ageActivity ?? [];
+
       const peakLoad = {
         weekly: normalizeRows(peakWeek),
         monthly: normalizeRows(peakMonth),
@@ -107,6 +192,8 @@ export function useAnalyticsData(
         stats,
         visitorActivity: visitorActivity ?? [],
         peakLoad,
+        genderActivity,
+        ageActivity,
       });
       setLastUpdated(new Date());
     } catch (err) {
@@ -116,11 +203,11 @@ export function useAnalyticsData(
     } finally {
       setLoading(false);
     }
-  }, [selectedDate, activeTab, from, to]);
+  }, [selectedDate, activeTab , from , to]);
 
   useEffect(() => {
     fetchAll();
-  }, [fetchAll, from, to]);
+  }, [fetchAll , from , to]);
 
   useEffect(() => {
     const id = setInterval(fetchAll, REFRESH_INTERVAL);
