@@ -60,7 +60,12 @@ function parseAgeData(rows) {
   ];
 }
 
-export function useAnalyticsData(selectedDate, activeTab = DEFAULT_TAB) {
+export function useAnalyticsData(
+  selectedDate,
+  activeTab = DEFAULT_TAB,
+  from,
+  to,
+) {
   const [data, setData] = useState({
     stats: null,
     visitorActivity: null,
@@ -69,12 +74,12 @@ export function useAnalyticsData(selectedDate, activeTab = DEFAULT_TAB) {
     ageActivity: null,
   });
 
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   const fetchAll = useCallback(async () => {
+    console.log("fetched fetchALL");
     try {
       setError(null);
       const dateString = selectedDate
@@ -89,22 +94,25 @@ export function useAnalyticsData(selectedDate, activeTab = DEFAULT_TAB) {
       const overviewPromise = getMonthlyOverview(monthParam).catch(() => null);
 
       const visitorActivityPromise = (async () => {
+        if ((from, to)) {
+          const data = await getDashboardFilter("all", from, to);
+          return normalizeRows(data);
+        }
         if (activeTab === "Месяц") {
-          const data = await getDashboardFilter('month');
+          const data = await getDashboardFilter("month");
           return normalizeRows(data);
         }
 
         if (activeTab === "Неделя") {
-          const data = await getDashboardFilter('week');
+          const data = await getDashboardFilter("week");
           return normalizeRows(data);
         }
         if (activeTab === "Сегодня") {
-          const today = new Date().toISOString().split('T')[0];
+          const today = new Date().toISOString().split("T")[0];
           const data = await getHourlyReport(today);
-          console.log(data , "DATA IN TAB")
+          console.log(data, "DATA IN TAB");
           return normalizeRows(data);
         }
-
         const hourlyData = await getHourlyReport(dateString);
         return normalizeRows(hourlyData);
       })();
@@ -190,11 +198,11 @@ export function useAnalyticsData(selectedDate, activeTab = DEFAULT_TAB) {
     } finally {
       setLoading(false);
     }
-  }, [selectedDate, activeTab]);
+  }, [selectedDate, activeTab, from, to]);
 
   useEffect(() => {
     fetchAll();
-  }, [fetchAll]);
+  }, [fetchAll, from, to]);
 
   useEffect(() => {
     const id = setInterval(fetchAll, REFRESH_INTERVAL);
@@ -204,11 +212,13 @@ export function useAnalyticsData(selectedDate, activeTab = DEFAULT_TAB) {
   return { data, loading, error, refetch: fetchAll, lastUpdated };
 }
 
-export function useTabData(activeTab, selectedDate) {
+export function useTabData(activeTab, selectedDate, from, to) {
   const [tabLoading, setTabLoading] = useState(false);
   const { data, loading, error, refetch, lastUpdated } = useAnalyticsData(
     selectedDate,
     activeTab,
+    from,
+    to,
   );
 
   const handleTabChange = useCallback(async () => {

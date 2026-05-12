@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -31,7 +32,6 @@ function CustomTooltip({ active, payload, label }) {
   return (
     <div className="custom-tooltip">
       <p>{label}</p>
-
       {payload.map((item) => (
         <div key={item.dataKey}>
           <span>{labels[item.dataKey] || item.dataKey}: </span>
@@ -48,12 +48,40 @@ export default function VisitorActivityChart({
   data = [],
   activeTab,
   onTabChange,
+  setFrom,
+  setTo,
 }) {
+  const [calendarKey, setCalendarKey] = useState(0);
+  const [isCustomRange, setIsCustomRange] = useState(false);
+
   const handleTabChange = (tab) => {
+    if (isCustomRange) {
+      setCalendarKey((k) => k + 1);
+      setIsCustomRange(false);
+      setFrom && setFrom(null);
+      setTo && setTo(null);
+    }
     if (onTabChange) onTabChange(tab);
   };
 
-  console.log(data, "CHART 1 DATA");
+  const formatDate = (date) => {
+    if (!date) return null;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+
+  const handleCalendarChange = ({ startDate, endDate }) => {
+    if (startDate && endDate) {
+      setIsCustomRange(true);
+      onTabChange && onTabChange(null);
+    } else {
+      setIsCustomRange(false);
+    }
+    setFrom && setFrom(formatDate(startDate));
+    setTo && setTo(formatDate(endDate));
+  };
 
   return (
     <div className="chart-card">
@@ -64,12 +92,17 @@ export default function VisitorActivityChart({
 
         <div className="tab-section">
           <div className="tab-bar">
-            <CalendarPanel />
+            <CalendarPanel
+              key={calendarKey}
+              setFrom={setFrom}
+              setTo={setTo}
+              onChange={handleCalendarChange}
+            />
 
             {TABS.map((t) => (
               <button
                 key={t}
-                className={`tab-btn ${activeTab === t ? "active" : ""}`}
+                className={`tab-btn ${!isCustomRange && activeTab === t ? "active" : ""}`}
                 onClick={() => handleTabChange(t)}
               >
                 {t}
@@ -89,18 +122,21 @@ export default function VisitorActivityChart({
             strokeDasharray="0"
             stroke="#e8eaf0"
           />
+
           <XAxis
-            dataKey={activeTab === "Сегодня" ? "label" : "day"}
+            dataKey={"day"}
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 11, fill: "#9ca3af" }}
           />
+
           <YAxis
             tickFormatter={formatY}
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 11, fill: "#9ca3af" }}
           />
+
           <Tooltip
             content={<CustomTooltip />}
             cursor={{ stroke: "#e8eaf0", strokeWidth: 1 }}
