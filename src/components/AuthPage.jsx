@@ -198,9 +198,6 @@ export default function AuthPage({ onLogin, mode = 'login' }) {
                             <div className="auth-profile-card">
                                 <div className="auth-profile-info">
                                     <p className="auth-profile-name">{account.username}</p>
-                                    <p className="auth-profile-date">
-                                        С нами с {new Date(account.createdAt).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                    </p>
                                 </div>
                             </div>
                         )}
