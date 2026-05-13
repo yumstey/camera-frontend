@@ -14,7 +14,7 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border-strong);
-    border-radius: 14px;
+    border-radius: 10px;
     color: var(--text-secondary);
     font-size: 13px;
     font-weight: 500;

@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import "../styles/charts.css";
 import CalendarPanel from "./CalendarPanel.jsx";
+import { formatDay } from "../helper/formatter/DateFormats.js";
 
 function formatY(val) {
   if (val >= 1_000_000) return `${val / 1_000_000}M`;
@@ -64,13 +65,7 @@ export default function VisitorActivityChart({
     if (onTabChange) onTabChange(tab);
   };
 
-  const formatDate = (date) => {
-    if (!date) return null;
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  };
+
 
   const handleCalendarChange = ({ startDate, endDate }) => {
     if (startDate && endDate) {
@@ -79,8 +74,8 @@ export default function VisitorActivityChart({
     } else {
       setIsCustomRange(false);
     }
-    setFrom && setFrom(formatDate(startDate));
-    setTo && setTo(formatDate(endDate));
+    setFrom && setFrom(formatDay(startDate));
+    setTo && setTo(formatDay(endDate));
   };
 
   return (

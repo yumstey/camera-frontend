@@ -56,3 +56,16 @@ export async function getTrafficByAgeGroups() {
     { name: "65+", value: 15, color: "#ec4899" },
   ];
 }
+
+
+export async function getLoad(params, from, to) {
+  let url = `/dashboard/load?period=${params}`;
+  if (from) {
+    url += `&from=${from}`;
+  }
+  if (to) {
+    url += `&to=${to}`;
+  }
+  const { data } = await http.get(url);
+  return data;
+}

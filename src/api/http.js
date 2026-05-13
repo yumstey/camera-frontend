@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const http = axios.create({
@@ -8,7 +7,6 @@ const http = axios.create({
         'Content-Type': 'application/json',
     },
 });
-
 http.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('pa_access_token');
@@ -19,7 +17,6 @@ http.interceptors.request.use(
     },
     (error) => Promise.reject(error)
 );
-
 http.interceptors.response.use(
     (response) => response,
     (error) => {

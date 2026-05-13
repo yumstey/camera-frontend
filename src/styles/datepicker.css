@@ -11,7 +11,7 @@
     background: var(--bg-white);
     backdrop-filter: blur(20px);
     border: 0.5px solid var(--border-strong);
-    border-radius: var(--r-md);
+    border-radius: 10px;
     font-family: var(--font);
     font-size: 13px;
     font-weight: 500;

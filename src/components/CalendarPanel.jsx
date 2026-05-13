@@ -166,13 +166,7 @@ function getPreset(key) {
   }
 }
 
-const PRESETS = [
-  { key: "today", label: "Сегодня" },
-  { key: "7d", label: "Последние 7 дней" },
-  { key: "30d", label: "Последние 30 дней" },
-  { key: "thisMonth", label: "Этот месяц" },
-  { key: "lastMonth", label: "Прошлый месяц" },
-];
+
 
 export default function DateRangePicker({ onChange }) {
   const today = new Date();
@@ -298,18 +292,6 @@ export default function DateRangePicker({ onChange }) {
 
       {open && (
         <div className="dp-dropdown">
-          <div className="dp-presets">
-            {PRESETS.map((p) => (
-              <button
-                key={p.key}
-                className="dp-preset-btn"
-                onClick={() => applyPreset(p.key)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-
           <div className="dp-calendar">
             <CalendarPanel
               viewYear={viewYear}
