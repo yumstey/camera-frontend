@@ -8,9 +8,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { formatDay } from "../helper/formatter/DateFormats.js";
 import "../styles/charts.css";
 import CalendarPanel from "./CalendarPanel.jsx";
-import { formatDay } from "../helper/formatter/DateFormats.js";
 
 function formatY(val) {
   if (val >= 1_000_000) return `${val / 1_000_000}M`;
@@ -64,8 +64,6 @@ export default function VisitorActivityChart({
     }
     if (onTabChange) onTabChange(tab);
   };
-
-
 
   const handleCalendarChange = ({ startDate, endDate }) => {
     if (startDate && endDate) {

@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  getAverageReport,
-  getDailyReport,
-  getDashboardFilter,
-  getHourlyReport,
-  getPeakLoad,
-} from "../api/analyticsApi";
+import { getDashboardFilter, getHourlyReport } from "../api/analyticsApi";
 
-const REFRESH_INTERVAL = 30_000;
+const REFRESH_INTERVAL = 30000;
 const DEFAULT_TAB = "Сегодня";
 
 function normalizeRows(response) {
@@ -19,65 +13,58 @@ function normalizeRows(response) {
   return [];
 }
 
+async function fetchVisitorActivity(activeTab, from, to) {
+  if (from && to) {
+    const data = await getDashboardFilter("all", from, to);
+    return normalizeRows(data);
+  }
 
+  if (activeTab === "Месяц") {
+    const data = await getDashboardFilter("month");
+    return normalizeRows(data);
+  }
+
+  if (activeTab === "Неделя") {
+    const data = await getDashboardFilter("week");
+    return normalizeRows(data);
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  const data = await getHourlyReport(today);
+  return normalizeRows(data);
+}
 
 export function useAnalyticsData(
-  selectedDate,
   activeTab = DEFAULT_TAB,
-  from,
-  to,
+  from = null,
+  to = null,
 ) {
-  const [data, setData] = useState({
-    visitorActivity: null,
-  });
-
+  const [data, setData] = useState({ visitorActivity: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+
   const fetchAll = useCallback(async () => {
     try {
+      setLoading(true);
       setError(null);
-      const visitorActivityPromise = (async () => {
-        if ((from, to)) {
-          const data = await getDashboardFilter("all", from, to);
-          return normalizeRows(data);
-        }
-        if (activeTab === "Месяц") {
-          const data = await getDashboardFilter("month");
-          return normalizeRows(data);
-        }
 
-        if (activeTab === "Неделя") {
-          const data = await getDashboardFilter("week");
-          return normalizeRows(data);
-        }
-        if (activeTab === "Сегодня") {
-          const today = new Date().toISOString().split("T")[0];
-          const data = await getHourlyReport(today);
-          return normalizeRows(data);
-        }
-      })();
-      const [
-        visitorActivity,
-      ] = await Promise.all([
-        visitorActivityPromise,
-      ]);
-      setData({
-        visitorActivity: visitorActivity ?? [],
-      });
+      const visitorActivity = await fetchVisitorActivity(activeTab, from, to);
+
+      setData({ visitorActivity });
       setLastUpdated(new Date());
     } catch (err) {
       setError(
-        err.response?.data?.message || err.message || "Failed to load data",
+        err.response?.data?.message || err.message || "Ошибка загрузки данных",
       );
     } finally {
       setLoading(false);
     }
-  }, [selectedDate, activeTab, from, to]);
+  }, [activeTab, from, to]);
 
   useEffect(() => {
     fetchAll();
-  }, [fetchAll, from, to]);
+  }, [fetchAll]);
 
   useEffect(() => {
     const id = setInterval(fetchAll, REFRESH_INTERVAL);
@@ -87,25 +74,12 @@ export function useAnalyticsData(
   return { data, loading, error, refetch: fetchAll, lastUpdated };
 }
 
-export function useTabData(activeTab, selectedDate, from, to) {
-  const [tabLoading, setTabLoading] = useState(false);
+export function useTabData(activeTab, from, to) {
   const { data, loading, error, refetch, lastUpdated } = useAnalyticsData(
-    selectedDate,
     activeTab,
     from,
     to,
   );
 
-  const handleTabChange = useCallback(async () => {
-    setTabLoading(true);
-    await refetch();
-    setTabLoading(false);
-  }, [refetch]);
-  return {
-    data,
-    loading: loading || tabLoading,
-    error,
-    refetch: handleTabChange,
-    lastUpdated,
-  };
+  return { data, loading, error, refetch, lastUpdated };
 }

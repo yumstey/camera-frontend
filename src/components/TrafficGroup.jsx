@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import "../styles/charts.css";
 import { getTrafficCategory } from "../api/analyticsApi";
 import { formatDay } from "../helper/formatter/DateFormats.js";
+import "../styles/charts.css";
 import CalendarPanel from "./CalendarPanel.jsx";
 import { Spinner } from "./Spinner";
 
@@ -62,16 +62,16 @@ export default function TrafficGroupChart({ title = "Трафик по кате�
     fetchData();
   }, [tab, from, to]);
 
-const tabData = data?.age_groups
-  ? Object.entries(data.age_groups)
-      .filter(([key]) => key !== "total")
-      .map(([key, count]) => ({
-        name: LABELS[key],
-        value: Math.round((count / data.age_groups.total) * 100),
-        raw: count,
-        color: COLORS[key],
-      }))
-  : [];
+  const tabData = data?.age_groups
+    ? Object.entries(data.age_groups)
+        .filter(([key]) => key !== "total")
+        .map(([key, count]) => ({
+          name: LABELS[key],
+          value: Math.round((count / data.age_groups.total) * 100),
+          raw: count,
+          color: COLORS[key],
+        }))
+    : [];
 
   const known = tabData.filter((d) => d.name !== "Unknown");
   const largest = known.length
@@ -147,7 +147,7 @@ const tabData = data?.age_groups
                 </div>
                 <div className="gender-legend__right">
                   <span className="gender-legend__raw">
-                    {new Intl.NumberFormat("ru-RU").format(item.raw)} чел. {' '}
+                    {new Intl.NumberFormat("ru-RU").format(item.raw)} чел.{" "}
                   </span>
                   <span className="gender-legend__pct">{item.value}%</span>
                 </div>

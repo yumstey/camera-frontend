@@ -166,8 +166,6 @@ function getPreset(key) {
   }
 }
 
-
-
 export default function DateRangePicker({ onChange }) {
   const today = new Date();
   const [open, setOpen] = useState(false);

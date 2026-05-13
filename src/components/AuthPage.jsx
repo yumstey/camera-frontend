@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { loginUser, registerUser } from "../api/authApi";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/authApi";
 import "../styles/auth.css";
+import { FiEye } from "react-icons/fi";
+import { FiEyeOff } from "react-icons/fi";
+
 
 const KEY = "pa_account";
 const TOKEN_KEY = "pa_access_token";
@@ -28,39 +31,7 @@ export function deleteAccount() {
   localStorage.removeItem(REFRESH_KEY);
 }
 
-const EyeIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
 
-const EyeOffIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-    <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
-    <line x1="2" y1="2" x2="22" y2="22" />
-  </svg>
-);
 
 function PinInput({ value, onChange, placeholder, onKeyDown, autoFocus }) {
   const [show, setShow] = useState(false);
@@ -76,70 +47,18 @@ function PinInput({ value, onChange, placeholder, onKeyDown, autoFocus }) {
         autoFocus={autoFocus}
         maxLength={32}
       />
-      <button
-        type="button"
-        className="auth-pin-toggle"
-        onClick={() => setShow((v) => !v)}
-      >
-        {show ? <EyeOffIcon /> : <EyeIcon />}
+      <button type="button" className="auth-pin-toggle" onClick={() => setShow((v) => !v)}>
+        {show ? <FiEye /> : <FiEyeOff />}
       </button>
     </div>
   );
 }
 
-function DeleteModal({ account, onConfirm, onCancel }) {
-  const [password, setPassword] = useState("");
-  const [err, setErr] = useState("");
-
-  function confirm() {
-    if (!password) {
-      setErr("Введите пароль для подтверждения");
-      return;
-    }
-    onConfirm();
-  }
-
-  return (
-    <div className="auth-modal-backdrop" onClick={onCancel}>
-      <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
-        <h3>Удалить аккаунт?</h3>
-        <p>
-          Введите пароль для подтверждения удаления{" "}
-          <strong>"{account.username}"</strong>.
-        </p>
-        <PinInput
-          value={password}
-          onChange={setPassword}
-          placeholder="Введите пароль"
-          autoFocus
-          onKeyDown={(e) => e.key === "Enter" && confirm()}
-        />
-        {err && (
-          <p className="auth-error" style={{ marginTop: 8 }}>
-            {err}
-          </p>
-        )}
-        <div className="auth-modal-actions" style={{ marginTop: 16 }}>
-          <button className="auth-modal-btn cancel" onClick={onCancel}>
-            Отмена
-          </button>
-          <button className="auth-modal-btn delete" onClick={confirm}>
-            Удалить
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function AuthPage({ onLogin, mode = "login" }) {
+export default function AuthPage({ onLogin }) {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [error, setError] = useState("");
-  const [showDelete, setShowDelete] = useState(false);
   const [shake, setShake] = useState(false);
 
   const account = loadAccount();
@@ -148,7 +67,7 @@ export default function AuthPage({ onLogin, mode = "login" }) {
     if (account?.username) {
       setLoginUsername(account.username);
     }
-  }, [account]);
+  }, []);
 
   function triggerShake() {
     setShake(true);
@@ -174,112 +93,58 @@ export default function AuthPage({ onLogin, mode = "login" }) {
       onLogin(accountData);
       navigate("/dashboard");
     } catch (err) {
-      setError(
-        err.response?.data?.message || err.message || "Ошибка при входе",
-      );
+      setError(err.response?.data?.message || err.message || "Ошибка при входе");
       triggerShake();
       setLoginPassword("");
     }
   }
 
-  async function handleCreate() {
-    setError("");
-    if (!username.trim() || username.trim().length < 2) {
-      setError("Имя должно быть не менее 2 символов");
-      return;
-    }
-    if (password.length < 4) {
-      setError("Пароль должен быть не менее 4 символов");
-      return;
-    }
-
-    try {
-      const result = await registerUser(username.trim(), password);
-      const accountData = {
-        username: username.trim(),
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken,
-        createdAt: new Date().toISOString(),
-      };
-      saveAccount(accountData);
-      onLogin(accountData);
-      navigate("/dashboard");
-    } catch (err) {
-      setError(
-        err.response?.data?.message || err.message || "Ошибка при регистрации",
-      );
-    }
-  }
-
-  function handleDelete() {
-    deleteAccount();
-    setShowDelete(false);
-    navigate("/login");
-    setUsername("");
-    setPassword("");
-  }
-
   function handleKey(e) {
-    if (e.key !== "Enter") return;
-    mode === "register" ? handleCreate() : handleLogin();
+    if (e.key === "Enter") handleLogin();
   }
 
   return (
     <div className="auth-bg">
-      <div className="auth-blob auth-blob--1" />
-      <div className="auth-blob auth-blob--2" />
-      <div className="auth-blob auth-blob--3" />
-
       <div className={`auth-card ${shake ? "shake" : ""}`}>
-          <>
-            <p className="auth-section-label">
-              {account ? "С возвращением" : "Вход"}
-            </p>
-            {account && (
-              <div className="auth-profile-card">
-                <div className="auth-profile-info">
-                  <p className="auth-profile-name">{account.username}</p>
-                </div>
-              </div>
-            )}
-            <label className="auth-label">Имя пользователя</label>
-            <input
-              className="auth-input"
-              placeholder="Admin"
-              value={loginUsername}
-              onChange={(e) => {
-                setLoginUsername(e.target.value);
-                setError("");
-              }}
-              onKeyDown={handleKey}
-              autoFocus
-            />
-            <label className="auth-label" style={{ marginTop: 14 }}>
-              Пароль
-            </label>
-            <PinInput
-              value={loginPassword}
-              onChange={setLoginPassword}
-              placeholder="Введите пароль"
-              onKeyDown={handleKey}
-            />
-            {error && <p className="auth-error">{error}</p>}
-            <button
-              className="auth-btn primary"
-              style={{ marginTop: 16 }}
-              onClick={handleLogin}
-            >
-              Войти в кабинет →
-            </button>
-          </>
-      </div>
-      {showDelete && account && (
-        <DeleteModal
-          account={account}
-          onConfirm={handleDelete}
-          onCancel={() => setShowDelete(false)}
+        <p className="auth-section-label">
+          {account ? "С возвращением" : "Вход"}
+        </p>
+        {account && (
+          <div className="auth-profile-card">
+            <div className="auth-profile-info">
+              <p className="auth-profile-name">{account.username}</p>
+            </div>
+          </div>
+        )}
+        <label className="auth-label">Имя пользователя</label>
+        <input
+          className="auth-input"
+          placeholder="Admin"
+          value={loginUsername}
+          onChange={(e) => {
+            setLoginUsername(e.target.value);
+            setError("");
+          }}
+          onKeyDown={handleKey}
+          autoFocus
         />
-      )}
+        <label className="auth-label" style={{ marginTop: 14 }}>
+          Пароль
+        </label>
+        <PinInput
+          value={loginPassword}
+          onChange={(v) => {
+            setLoginPassword(v);
+            setError("");
+          }}
+          placeholder="Введите пароль"
+          onKeyDown={handleKey}
+        />
+        {error && <p className="auth-error">{error}</p>}
+        <button className="auth-btn primary" style={{ marginTop: 16 }} onClick={handleLogin}>
+          Войти в кабинет →
+        </button>
+      </div>
     </div>
   );
 }
