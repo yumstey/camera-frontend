@@ -119,25 +119,13 @@ export default function App() {
                     <p className="block-label" style={{ marginTop: 16 }}>
                       Трафик по категориям
                     </p>
-                    {loading || !data.genderActivity ? (
-                      <div className="card" style={{ minHeight: 260 }}>
-                        <Spinner />
-                      </div>
-                    ) : (
                       <TrafficGenderChart title="Трафик по категориям" />
-                    )}
                   </div>
                   <div>
                     <p className="block-label" style={{ marginTop: 16 }}>
                       Трафик по возрастным группам
                     </p>
-                    {loading || !data.ageActivity ? (
-                      <div className="card" style={{ minHeight: 260 }}>
-                        <Spinner />
-                      </div>
-                    ) : (
                       <TrafficGroupChart title="Трафик по возрастным группам" />
-                    )}
                   </div>
                 </div>
               </>

@@ -110,8 +110,6 @@ export default function PeakLoadChart() {
             ))}
           </div>
         </div>
-
-        {/* Faqat chart qismi loading ga bog'liq */}
         {loading ? (
           <div
             style={{

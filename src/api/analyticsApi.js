@@ -69,3 +69,26 @@ export async function getLoad(params, from, to) {
   const { data } = await http.get(url);
   return data;
 }
+
+export async function getTrafficGender(period, from, to) {
+  let url = `/dashboard/counts/genders?period=${period}`;
+  if (from) {
+    url += `&from=${from}`;
+  }
+  if (to) {
+    url += `&to=${to}`;
+  }
+  const { data } = await http.get(url);
+  return data;
+}
+export async function getTrafficCategory(period, from, to) {
+  let url = `/dashboard/counts/age-groups?period=${period}`;
+  if (from) {
+    url += `&from=${from}`;
+  }
+  if (to) {
+    url += `&to=${to}`;
+  }
+  const { data } = await http.get(url);
+  return data;
+}
