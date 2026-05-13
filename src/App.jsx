@@ -14,30 +14,17 @@ import Sidebar from "./components/Sidebar";
 import { Spinner } from "./components/Spinner.jsx";
 import TrafficGenderChart from "./components/TrafficGenderChart";
 import TrafficGroupChart from "./components/TrafficGroup.jsx";
-import {Provider} from "./components/ui/provider.jsx";
+import { Provider } from "./components/ui/provider.jsx";
 import VisitorActivityChart from "./components/VisitorActivityChart";
-import { useTabData } from "./hooks/useAnalyticsData";
 import "./styles/global.css";
 
 export default function App() {
   const [account, setAccount] = useState(() => loadAccount());
   const [activeNav, setActiveNav] = useState("dashboard");
-  const [visitorTab, setVisitorTab] = useState("Сегодня");
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [from, setFrom] = useState();
-  const [to, setTo] = useState();
-
-  const { data, loading, error, refetch } = useTabData(
-    visitorTab,
-    selectedDate,
-    from,
-    to,
-  );
-
   const handleTabChange = (tab) => {
     setVisitorTab(tab);
   };
-
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
@@ -96,25 +83,12 @@ export default function App() {
                       })}
                     </div>
                   )}
-                  {error && <div className="error-msg">⚠ {error}</div>}
                   <p className="block-label">Обзор</p>
                   <DashboardStats day={selectedDate} />
                   <p className="block-label" style={{ marginTop: 16 }}>
                     Активность посетителей
                   </p>
-                  {loading || !data.visitorActivity ? (
-                    <div className="card">
-                      <Spinner />
-                    </div>
-                  ) : (
-                    <VisitorActivityChart
-                      data={data.visitorActivity}
-                      activeTab={visitorTab}
-                      onTabChange={handleTabChange}
-                      setFrom={setFrom}
-                      setTo={setTo}
-                    />
-                  )}
+                    <VisitorActivityChart  />
                   <div className="bottom-grid">
                     <PeakLoadChart />
                     <div>

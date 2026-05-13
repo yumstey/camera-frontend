@@ -9,6 +9,7 @@ export async function getHourlyReport(day) {
   return data;
 }
 export async function getDashboardFilter(params, from, to) {
+  console.log("A__________" , from , to)
   let url = `/dashboard/filter?filter=${params}`;
   if (from) {
     url += `&from=${from}`;

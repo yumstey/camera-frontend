@@ -1,18 +1,13 @@
 import { useEffect, useState } from "react";
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+  Bar, BarChart, CartesianGrid, ResponsiveContainer,
+  Tooltip, XAxis, YAxis,
 } from "recharts";
 import { getLoad } from "../api/analyticsApi";
-import { formatDay } from "../helper/formatter/DateFormats.js";
 import "../styles/charts.css";
 import CalendarPanel from "./CalendarPanel.jsx";
 import { Spinner } from "./Spinner";
+import { formatDay } from "../helper/formatter/DateFormats.js";
 
 function StatPill({ label, color }) {
   return (
@@ -33,12 +28,7 @@ function CustomTooltip({ active, payload, label }) {
       {payload.map((p) => (
         <div
           key={p.dataKey}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 12,
-            fontSize: 12,
-          }}
+          style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 12 }}
         >
           <span style={{ color: p.fill, fontWeight: 600 }}>{p.name}</span>
           <span>{new Intl.NumberFormat().format(p.value)}</span>
@@ -70,8 +60,8 @@ export default function PeakLoadChart() {
   const handleCalendarChange = ({ startDate, endDate }) => {
     if (startDate && endDate) {
       setIsCustomRange(true);
-      setFrom(formatDay(startDate));
-      setTo(formatDay(endDate));
+      setFrom(startDate);
+      setTo(endDate);
     } else {
       setIsCustomRange(false);
       setFrom(null);
@@ -92,9 +82,9 @@ export default function PeakLoadChart() {
       }
     };
     fetchLoad();
-  }, [tab, from, to]);
+  }, [tab, from, to]); 
 
-  return (
+    return (
     <div>
       <p className="block-label" style={{ marginTop: 16 }}>
         Пиковая нагрузка

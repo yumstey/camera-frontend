@@ -476,3 +476,182 @@
   text-shadow: 0 0 4px rgba(220, 38, 38, 0.4);
 }
 
+.camera-preview:hover .camera-zoom-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.camera-zoom-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  z-index: 5;
+}
+
+.camera-zoom-btn:hover {
+  background: rgba(0, 113, 227, 0.75);
+}
+
+.camera-zoom-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ── Lightbox ── */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.18s ease;
+  padding: 24px;
+}
+
+.lightbox {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255,255,255,0.08);
+  animation: lightboxPop 0.24s var(--ease);
+  background: #0a0a10;
+}
+
+@keyframes lightboxPop {
+  from { opacity: 0; transform: scale(0.93) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.lightbox__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+}
+
+.lightbox__title {
+  display: flex;
+  flex-direction: column;
+}
+
+.lightbox__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.2px;
+}
+
+.lightbox__ip {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  font-family: var(--font-mono);
+  margin-top: 1px;
+}
+
+.lightbox__close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease;
+}
+
+.lightbox__close:hover {
+  background: rgba(255, 59, 48, 0.65);
+}
+
+.lightbox__img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+.lightbox__footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+}
+
+.lightbox__badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(6px);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 0.5px solid rgba(255,255,255,0.15);
+}
+
+.lightbox__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34c759;
+  animation: livePulse 2s ease infinite;
+}
+
+.lightbox__role {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.lightbox__role.checkin {
+  background: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+  border: 0.5px solid rgba(16,185,129,0.3);
+}
+
+.lightbox__role.checkout {
+  background: rgba(220, 38, 38, 0.25);
+  color: #f87171;
+  border: 0.5px solid rgba(220,38,38,0.3);
+}
